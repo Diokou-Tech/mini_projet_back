@@ -14,4 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/',[ApiXmlController::class,'getData'])->name('test');
+Route::get('/',function(){
+    return view('welcome');
+})->name('home');
