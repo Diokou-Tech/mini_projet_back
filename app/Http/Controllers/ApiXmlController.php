@@ -33,6 +33,7 @@ class ApiXmlController extends Controller
             $this->data[$i]['titre'] = $value->title->__toString();
             $this->data[$i]['description'] = $value->description->__toString();
             $this->data[$i]['date_pub'] = $value->pubDate->__toString();
+            $this->data[$i]['lien'] = $value->link->__toString();
             $this->data[$i]['id'] = $i;
             // image
             $content = $value->children('media', true)->content;
