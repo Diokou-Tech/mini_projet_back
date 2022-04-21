@@ -60,4 +60,17 @@ class ApiXmlController extends Controller
             'data' => $dataCurrent
         ]);
     }
+    public function getInfo(String $titre)
+    {
+        $info = '';
+        $data = self::getData();
+        foreach($data as $da){
+            if($da['titre'] == $titre){
+                $info = $da;
+            }
+        }
+        return response()->json([
+            'data' => $info
+        ]);
+    }
 }

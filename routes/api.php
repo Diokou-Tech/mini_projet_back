@@ -15,5 +15,6 @@ use App\Http\Controllers\ApiXmlController;
 |
 */
 
-Route::get('/news/{page?}/{perPage?}',[ApiXmlController::class,'getNews']);
+Route::get('/infos/{page?}/{perPage?}',[ApiXmlController::class,'getNews']);
+Route::get('/info/{titre}',[ApiXmlController::class,'getInfo']);
 
