@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use SimpleXMLElement;
 
@@ -47,7 +48,7 @@ class ApiXmlController extends Controller
         return $this->data;
     }
 
-    public function getNews($page = 1, $perPage = 10)
+    public function getNews($page = 1, $perPage = 15)
     {
         $data = self::getData();
         $dataReported = array_chunk($data,$perPage,true);
@@ -72,5 +73,9 @@ class ApiXmlController extends Controller
         return response()->json([
             'data' => $info
         ]);
+    }
+    public function setInfo(Request $req)
+    {
+        dd($req);
     }
 }
