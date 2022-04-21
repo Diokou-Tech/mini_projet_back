@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Info;
+use SimpleXMLElement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use SimpleXMLElement;
 
 class ApiXmlController extends Controller
 {
@@ -48,8 +49,29 @@ class ApiXmlController extends Controller
         return $this->data;
     }
 
+    public function SaveToDB() : void
+    {
+        $datas = self::getData();
+        foreach($datas as $data)
+        {
+        
+         $info = Info::where('lien',$data['lien'])->first();
+         if(!$info){
+            $save =Info::create([
+                'titre' => $data['titre'],
+                'description' => $data['description'],
+                'lien' => $data['lien'],
+                'date_pub' => $data['date_pub'],
+                'image' => json_encode($data['image']),
+            ]);
+        }
+    }
+    $infos =Info::all();
+    }
+
     public function getNews($page = 1, $perPage = 15)
     {
+        // self::SaveToDB();
         $data = self::getData();
         $dataReported = array_chunk($data,$perPage,true);
         $dataCurrent = $dataReported[$page-1];
