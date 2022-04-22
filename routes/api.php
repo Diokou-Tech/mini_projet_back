@@ -14,9 +14,12 @@ use App\Http\Controllers\ApiXmlController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+// recupérer tous les infos 
 Route::get('/infos/{page?}/{perPage?}',[ApiXmlController::class,'getNews']);
+// recuperer une information donnée à travers son titre
 Route::get('/info/{titre}',[ApiXmlController::class,'getInfo']);
+// modifier l'information
 Route::post('/info',[ApiXmlController::class,'setInfo']);
-Route::get('/saveDB',[ApiXmlController::class,'SaveToDB']);
+// permet de rafraichir les infos en enregistrant dans la base de donnéess
+Route::get('/refresh/infos',[ApiXmlController::class,'SaveToDB']);
 

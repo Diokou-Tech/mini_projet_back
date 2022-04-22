@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Info;
+use Carbon\Carbon;
 use SimpleXMLElement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -30,8 +31,8 @@ class ApiXmlController extends Controller
         $source['date_pub'] = $xml->channel->pubDate->__toString();
         $source['langue'] = $xml->channel->language->__toString();
         // recuperer les données
-        $i=0;
-        foreach( $xml->channel->item as $value){
+        $i = 0;
+        foreach ($xml->channel->item as $value) {
             $this->data[$i]['titre'] = $value->title->__toString();
             $this->data[$i]['description'] = $value->description->__toString();
             $this->data[$i]['date_pub'] = $value->pubDate->__toString();
@@ -40,41 +41,53 @@ class ApiXmlController extends Controller
             // image
             $content = $value->children('media', true)->content;
             $contentattr = $content->attributes();
-            foreach($contentattr as $name => $value){
-            // echo $name . ' = '.  $value . '<br />';
-            $this->data[$i]['image'][$name] = $value->__toString();
+            foreach ($contentattr as $name => $value) {
+                // echo $name . ' = '.  $value . '<br />';
+                $this->data[$i]['image'][$name] = $value->__toString();
             }
             $i++;
         }
         return $this->data;
     }
 
-    public function SaveToDB() : void
+    public function SaveToDB()
     {
-        $datas = self::getData();
-        foreach($datas as $data)
-        {
-        
-         $info = Info::where('lien',$data['lien'])->first();
-         if(!$info){
-            $save =Info::create([
-                'titre' => $data['titre'],
-                'description' => $data['description'],
-                'lien' => $data['lien'],
-                'date_pub' => $data['date_pub'],
-                'image' => json_encode($data['image']),
-            ]);
+        $datas = null;
+        try {
+            $datas = self::getData();
+            $status = true;
+            $message = 'Mise à jour des informations avec succès !';
+            foreach ($datas as $data) {
+                $info = Info::where('lien', $data['lien'])->first();
+                if (!$info) {
+                    $date_for_human =  Carbon::parse($data['date_pub'])->diffForHumans();
+                    
+                    Info::create([
+                        'titre' => $data['titre'],
+                        'description' => $data['description'],
+                        'lien' => $data['lien'],
+                        'date_pub' => Carbon::parse('Fri, 22 Apr 2022 10:32:13 +0200')->format('D, d F Y h:i'),
+                        'image' => $data['image']['url'],
+                        'date_for_human' => $date_for_human
+                    ]);
+                }
+            }
+        } catch (\Throwable $th) {
+            $status = false;
+            $message = 'Erreur de mise à jour d\'informations !'.$th->getMessage();
         }
-    }
-    $infos =Info::all();
+        return response()->json([
+            'data' => Info::orderBy('date_pub','desc')->paginate(10),
+            'message' => $message,
+            'status' => $status
+        ]);
     }
 
     public function getNews($page = 1, $perPage = 15)
     {
-        // self::SaveToDB();
         $data = self::getData();
-        $dataReported = array_chunk($data,$perPage,true);
-        $dataCurrent = $dataReported[$page-1];
+        $dataReported = array_chunk($data, $perPage, true);
+        $dataCurrent = Info::orderBy('date_pub','desc')->paginate(10);
         return response()->json([
             'total' => count($data),
             'perPage' => $perPage,
@@ -87,8 +100,8 @@ class ApiXmlController extends Controller
     {
         $info = '';
         $data = self::getData();
-        foreach($data as $da){
-            if($da['titre'] == $titre){
+        foreach ($data as $da) {
+            if ($da['titre'] == $titre) {
                 $info = $da;
             }
         }
