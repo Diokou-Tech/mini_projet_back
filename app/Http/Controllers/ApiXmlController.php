@@ -37,7 +37,7 @@ class ApiXmlController extends Controller
             $this->data[$i]['description'] = $value->description->__toString();
             $this->data[$i]['date_pub'] = $value->pubDate->__toString();
             $this->data[$i]['lien'] = $value->link->__toString();
-            $this->data[$i]['id'] = $i;
+            // $this->data[$i]['id'] = $i;
             // image
             $content = $value->children('media', true)->content;
             $contentattr = $content->attributes();
@@ -85,26 +85,13 @@ class ApiXmlController extends Controller
 
     public function getNews($page = 1, $perPage = 15)
     {
-        $data = self::getData();
-        $dataReported = array_chunk($data, $perPage, true);
         $dataCurrent = Info::orderBy('date_pub','desc')->paginate(10);
-        return response()->json([
-            'total' => count($data),
-            'perPage' => $perPage,
-            'lastPage' => count($dataReported),
-            'page' => $page,
-            'data' => $dataCurrent
-        ]);
+        return $dataCurrent;
     }
     public function getInfo(String $titre)
     {
         $info = '';
-        $data = self::getData();
-        foreach ($data as $da) {
-            if ($da['titre'] == $titre) {
-                $info = $da;
-            }
-        }
+        $info = Info::where('titre',$titre)->first();
         return response()->json([
             'data' => $info
         ]);
