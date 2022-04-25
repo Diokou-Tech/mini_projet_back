@@ -85,7 +85,7 @@ class ApiXmlController extends Controller
 
     public function getNews($page = 1, $perPage = 15)
     {
-        $dataCurrent = Info::orderBy('date_pub','desc')->paginate(10);
+        $dataCurrent = Info::orderBy('date_pub','desc')->get();
         return $dataCurrent;
     }
     public function getInfo(String $titre)
@@ -98,6 +98,14 @@ class ApiXmlController extends Controller
     }
     public function setInfo(Request $req)
     {
-        dd($req);
+        $data = $req->all()[0];
+        $info = Info::find($data['id']);
+        $info->titre = $data['titre'];
+        $info->description = $data['description'];
+        $info->save();
+        return response()->json([
+            'data' => $info,
+            'message' => 'Modification avec succès'
+        ]);
     }
 }
